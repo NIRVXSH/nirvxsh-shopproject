@@ -1,10 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/NIRVXSH/NIRVXSH-shop-project/config"
+	"github.com/NIRVXSH/NIRVXSH-shop-project/modules/servers"
 	"github.com/NIRVXSH/NIRVXSH-shop-project/pkg/databases"
 )
 
@@ -22,5 +22,5 @@ func main() {
 	db := databases.DbConnect(cfg.Db())
 	defer db.Close()
 
-	fmt.Println(db)
+	servers.NewServer(cfg, db).Start()
 }
