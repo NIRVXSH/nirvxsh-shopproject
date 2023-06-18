@@ -1,6 +1,9 @@
 package servers
 
 import (
+	"github.com/NIRVXSH/NIRVXSH-shop-project/modules/middlewares/middlewaresHandlers"
+	"github.com/NIRVXSH/NIRVXSH-shop-project/modules/middlewares/middlewaresRepositories"
+	"github.com/NIRVXSH/NIRVXSH-shop-project/modules/middlewares/middlewaresUsecases"
 	"github.com/NIRVXSH/NIRVXSH-shop-project/modules/monitor/monitorHandlers"
 	"github.com/gofiber/fiber/v2"
 )
@@ -10,15 +13,24 @@ type IModuleFactory interface {
 }
 
 type moduleFactory struct {
-	r fiber.Router
-	s *server
+	r   fiber.Router
+	s   *server
+	mid middlewaresHandlers.IMiddlewaresHandler
 }
 
-func InitModule(r fiber.Router, s *server) IModuleFactory {
+func InitModule(r fiber.Router, s *server, mid middlewaresHandlers.IMiddlewaresHandler) IModuleFactory {
 	return &moduleFactory{
-		r: r,
-		s: s,
+		r:   r,
+		s:   s,
+		mid: mid,
 	}
+}
+
+func InitMiddlewares(s *server) middlewaresHandlers.IMiddlewaresHandler {
+	repository := middlewaresRepositories.MiddlewaresRepository(s.db)
+	usecase := middlewaresUsecases.MiddlewaresUsecase(repository)
+	return middlewaresHandlers.MiddlewaresHandler(s.cfg, usecase)
+
 }
 
 func (m *moduleFactory) MonitorModule() {
